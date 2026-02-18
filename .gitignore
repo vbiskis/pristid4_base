@@ -50,6 +50,7 @@ bib/
 # data files
 *.xlsx
 *.csv
+*.docx
 
 # mac files
 *.DS_Store
