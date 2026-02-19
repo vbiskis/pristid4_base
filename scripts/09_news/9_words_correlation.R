@@ -1,5 +1,5 @@
 # Details ----
-#' 9_news_words_corr.R
+#' 9_words_correlation.R
 #' Paper: [Est. extent of range contraction and extinction timeline]
 #' DOI: tbd
 #' Author: Nikki Biskis

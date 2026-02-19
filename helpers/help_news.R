@@ -7,19 +7,13 @@
 #' Content: making a src code for prep of our dfs!
 #' -----------
 
-#data cleaning
-library(dplyr)
-library(tidyverse)
-library(writexl)
-library(lubridate)
+pacman::p_load('dplyr', 'tidyverse', 'readxl', 'writexl', 'lubridate', #data cleaning
+               'wordcloud', 'tidytext', 'tm', #words
+               'ggplot2', 'ggpubr', 'pilot', 'MetBrewer') #and plot themes 
 
-#text analysis
-library(wordcloud)
-library(tidytext)
-library(tm)
-
-#graphing
-library(ggplot2)
-library(ggpubr)
-library(pilot) #love these themes
-library(MetBrewer)
+suppressWarnings({mytheme <- pilot::theme_pilot(axis_title_size = 12, legend_title_size = 12,
+                                                legend_title_family = "Optima", legend_text_family = "Optima",
+                                                facet_title_family = "Optima", facet_title_size = 12,
+                                                subtitle_family = "optima", 
+                                                axis_title_family = "Optima", axis_text_family = "Optima") 
+}) # my god shes loud

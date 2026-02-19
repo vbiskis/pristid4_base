@@ -10,6 +10,9 @@
 #' -----------
 
 source('helpers/help_stat.R')
+source('helpers/help_map.R')
+set_theme(mytheme)
+
 EC_Dec <- readxl::read_xlsx("data/xls/processed/EC_Dec.xlsx") 
 
 # filter ----
@@ -49,23 +52,26 @@ anova(gam1, gam2) #adding Zone as main effect better
 # make plots----
 p1 <- plot_predictions(gam2, by = "Decade", rug = TRUE) +
   labs(y = "Annual Sawfish Encounters") +
-  theme_minimal() +
-  theme(axis.title.x = element_text(margin = 
-                                      margin(t = -30, b = 0)))
+  theme(axis.title.x = element_text(vjust = 15),
+        axis.text.x = element_text(vjust = 0.8, margin = margin(b = 0)))
 
 p2 <- plot_predictions(gam2, condition = "Zone") +
-  labs(y = "", x = "") + 
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1,
+                                   margin = margin(b = 0)),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank())
 
 p1 + p2 + plot_layout(widths = c(1, 2)) +
-  plot_annotation(tag_levels = 'a', tag_suffix = ')')
+  plot_annotation(tag_levels = 'a', tag_suffix = ')') &
+  theme(plot.margin = margin(5, 5, 0, 5),
+        plot.tag = element_text(margin = margin(b = -10, r = -15),
+                                size = 13, family = "optima"))
 
 ggsave(
-  "figs/s7/s7a_partialab_plot.tiff",
+  "s7a_parplot_ab.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/s7/",
   scale = 1,
   width = 6,
   height = 4,
@@ -76,13 +82,17 @@ ggsave(
 )
 
 # appraisal plot----
-appraise(gam2) #k its that one i think
-
+appraise(gam2) & theme(plot.title = element_text(size = 12, family = "Optima",
+                                                 margin = margin(t = 5, b = 10, unit = "pt")),
+                       plot.subtitle = element_text(margin = margin(b = 5, unit = "pt")),
+                       plot.margin = margin(l = 2, t = 0, b = 5, r = 10, unit = "pt"),
+                       axis.title.y = element_text(margin = margin(r = 5, unit = "pt")))
+  
 ggsave(
-  "figs/s7/s7a_res_plot.png",
+  "s7b_res_plot.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = 'figs/s7/',
   scale = 1,
   width = 6,
   height = 4,

@@ -1,11 +1,12 @@
 # Details ----
-#' 9_news_words_get.R
+#' 9_getwords.R
 #' Paper: [Est. extent of range contraction and extinction timeline]
 #' DOI: tbd
 #' Author: Nikki Biskis
 #' Date: 2025-12-1
-#' Content: prep for word analysis: get word counts
-#' + Figure 12
+#' Content: prep for word analysis
+#' + get word counts
+#' + mutate and filter similar words for frequencies
 #' -----------
 
 source('helpers/help_news.R')
@@ -86,7 +87,7 @@ trust_words <- c("author", "advised", "accommodation", "dear", "result",
                   "policeman", "father", "police", "shoulder", "remains", 
                    "base", "dictionary", "cap", "employ", "courier", 
                    "bank", "iron", "rod", "coach", "account", "majority", 
-                   "church", "green", "wear", "mother", "cover", 
+                   "church", "green", "wear", "mother", "cover",
                    "feeling", "harbor", "sir", "smith", "badge", "teacher", 
                    "council", "rule", "measure", "ambulance", "depth", "ground",
                    "chronicle", "doctor", "usual", "symmetry", "witness", 

@@ -9,6 +9,7 @@
 #' -----------
 
 source('helpers/help_news.R')
+set_theme(mytheme)
 filthist <- readxl::read_xlsx("data/xls/processed/trove_main.xlsx") 
 
 #id graph----
@@ -35,21 +36,22 @@ id_percent <- id_year %>%
 # Plot top words over time
 ggplot(id_percent, aes(x = Year_Art, y = percentage, fill = word)) +
   geom_area(position = "fill", alpha = 1) +  
-  labs(title = "", 
-       fill = "Common Name Used",
+  labs(fill = "Common Name Used",
        x = "Year", 
        y = "Proportion of Articles") +
-  theme_minimal() +
   theme(
-    legend.position = "bottom"
+    legend.position = "bottom",
+    axis.title.x = element_text(vjust = 2),
+    plot.margin = margin(0, 0, 5, 5),
+    legend.margin = margin(0, 5, 0, 5)
   ) +
   scale_fill_brewer()
 
 ggsave(
-  "figs/s11/swordfishj.tiff",
+  "swordfishj.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/s11/",
   scale = 1,
   width = 6,
   height = 4,

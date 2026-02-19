@@ -11,10 +11,13 @@
 #' Output: methods study area figure (fig4.png/tiff)
 #' -----------
 
-source('helpers/help_map.R')
+source('helpers/help_news.R') # themes here
+set_theme(mytheme)
+
+source('helpers/help_map.R') # boundaries here
 ecbasins <- readRDS('data/rds/ecbasins.rds') #overlay
 
-# need a couple visuals here
+# need a couple visuals 
 ## align labels at eastern most point
 ## boxes around regions
 
@@ -75,15 +78,18 @@ regions_coastal <- tibble(
 studyplace <- ggplot() +
   geom_sf(data = regions_coastal, fill = NA, color = "grey", size = 1) +
   geom_sf(data = aus_east, fill = "white") +
-  geom_sf(data = ecbasins, aes(fill = RNAME2), color = "black", size = 0.2) +
+  geom_sf(data = ecbasins, aes(fill = RNAME2), color = "grey20", size = 0.2) +
   geom_sf_text(data = regions_coastal, aes(label = region_name), 
-               x = regions_coastal$east_bound - 3.5, size = 3.5) +
+               x = regions_coastal$east_bound - 3.5, size = 3.2,
+               family = "optima") +
   scale_fill_viridis_d(
     name = "River Region",
     option = "turbo",
     direction = -1 
   ) +
-  theme_void()
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        plot.margin = margin(0, 5, 5, 5))
 
 ggsave(
   "fig4.png",

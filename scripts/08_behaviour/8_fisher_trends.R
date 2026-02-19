@@ -8,6 +8,9 @@
 #' -----------
 
 source('helpers/help_stat.R')
+source('helpers/help_news.R')
+set_theme(mytheme)
+
 library(patchwork)
 
 EC_Date <- readxl::read_xlsx("data/xls/processed/EC_Date.xlsx") 
@@ -61,18 +64,6 @@ gear_temporal <- gear_trends %>%
   mutate(prop = n / sum(n)) %>%
   ungroup() %>% 
   mutate(
-    # MetCapF = case_when(
-    #   MetCapGen == "Set/Seine Net" & Fish_Type == "Comm" ~ "Net (Commercial)",
-    #   MetCapGen == "Set/Seine Net" & Fish_Type == "Rec" ~ "Net (Recreational)",
-    #   MetCapGen == "Set/Seine Net" & is.na(Fish_Type) ~ "Net (Unknown)",  
-    #   TRUE ~ MetCapGen
-    # ),
-    # pattern_type = case_when(
-    #   MetCapGen == "Set/Seine Net" & Fish_Type == "Comm" ~ "stripe",
-    #   MetCapGen == "Set/Seine Net" & Fish_Type == "Rec" ~ "circle",
-    #   MetCapGen == "Set/Seine Net" & is.na(Fish_Type) ~ "solid",  
-    #   TRUE ~ "none"
-    # ),
     MetCap1 = factor(MetCap1, 
                      levels = c("Non-Fishing", "Targeted", "Line Fishing", 
                                 "Cast/Bait Net", "Fish Trap", 
@@ -96,16 +87,13 @@ f1 <- ggplot(gear_temporal, aes(x = decade, y = prop,
                                                     %in% x], ")")
   ) +
   labs(
-    title = "",
     x = "Decade",
     y = "Percent of Captures", 
     fill = "Method of Capture"
   ) +
-  theme_minimal() +
   scale_fill_brewer(palette = 'Paired') +
   theme(
-    legend.position = "right",
-    axis.text.x = element_text(angle = 45, hjust = 1)
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
   )
 
 EC_Date %>%
@@ -129,26 +117,24 @@ rls_decade <- rls_trends %>%
   mutate(prop = n / sum(n)) %>%
   ungroup()
 
-#library(ggthemes)
-
 f2 <- ggplot(rls_decade, aes(x = decade, y = prop,
                        fill = Fate_Cln)) +
   geom_col(position = "fill", width = 8) +  
   scale_y_continuous(labels = scales::percent) +
   scale_fill_tableau(palette = "Color Blind",
                      name = "Fate") +
-  theme_minimal() +
   theme(axis.text.x = element_blank(),
         axis.title.x = element_blank()) +
   labs(y = "Percent of Interactions")
 
-(f2 + theme(plot.margin = margin(5, 5, 0, 5))) / f1
+f2 / f1 & theme(plot.margin = margin(5, 5, 5, 5),
+                legend.justification = "left")
 
 ggsave(
-  "figs/fig10/fig10_fishertrends.tiff",
+  "fig10.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/fig10/",
   scale = 1,
   width = 9,
   height = 6,

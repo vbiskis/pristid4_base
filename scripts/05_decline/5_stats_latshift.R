@@ -11,6 +11,7 @@
 
 source('helpers/help_stat.R')
 source('helpers/help_map.R')
+set_theme(mytheme)
 
 EC_Dens <- readxl::read_xlsx("data/xls/processed/EC_Dens.xlsx") 
 
@@ -70,20 +71,20 @@ ggplot(EC_Dens,
     x = "Year",
     y = "Latitude"
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 11),
     legend.position = "bottom",
-    legend.box = "horizontal"
+    legend.box = "horizontal",
+    plot.margin = margin(5, 5, 5, 5)
   ) +
   guides(
     color = guide_legend(override.aes = list(size = 4, alpha = 1, stroke = 1)))
 
 ggsave(
-  "figs/s6/s6_latitude.png",
+  "s6_latitude.tiff",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/s6/",
   scale = 1,
   width = 8,
   height = 5,

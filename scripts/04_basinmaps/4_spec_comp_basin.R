@@ -12,6 +12,9 @@
 source('helpers/help_map.R')
 EC_Spec <- readxl::read_xlsx("data/xls/processed/EC_Spec.xlsx") #just mapping!
 
+source('helpers/help_news.R')
+set_theme(mytheme)
+
 #frequency of reports----
 spec_basin <- EC_Spec %>%
   filter(Rec_Acc > 0, 
@@ -65,26 +68,25 @@ ggplot(spec_basin) +
                linewidth = 4,
                alpha = 0.75,
                inherit.aes = FALSE) +
-  
   # Vertical zone lines
   geom_vline(xintercept = zone_breaks, color = "black", 
              linetype = "longdash", linewidth = .25,
              alpha = 0.7, lineend = "round") +
-  
   scale_fill_manual(name = "Species", 
                     values = species_colors,
                     labels = species_labels) +
-  
-  labs(title = "", y = "Total Records", x = "River Basin") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.margin = margin(1.5, 1.5, 0, 15, "pt"))
+  scale_x_discrete(breaks = levels(spec_basin$Basinnames)[c(TRUE, FALSE)]) +
+  labs(y = "Total Records", x = "River Basin") +
+  theme(axis.text.x = element_text(angle = 90, size = 12, hjust = 1),
+        axis.title = element_text(size = 13),
+        legend.text = element_text(size = 12), legend.title = element_text(size = 13),
+        plot.margin = margin(2, 2, 2, 2, "pt"))
 
 ggsave(
-  "figs/fig5/riv_bar.png",
+  "fig5.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/fig5/",
   scale = 1,
   width = 10,
   height = 5,

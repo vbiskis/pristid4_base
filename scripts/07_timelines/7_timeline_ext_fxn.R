@@ -940,6 +940,7 @@ plot_timeline <- function(results_list, group_names, title,
          x = "Year", y = "Region") +
     
     theme_few() +
+    
     theme(
       legend.position = "bottom",
       legend.box = "horizontal", 

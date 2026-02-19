@@ -37,6 +37,7 @@ rsconnect/
 sample/
 *.udpipe
 alt/
+orig/
 
 # large files
 *.tiff

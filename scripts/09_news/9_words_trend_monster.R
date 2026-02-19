@@ -11,6 +11,8 @@
 source('helpers/help_news.R')
 
 trove_main <- readxl::read_xlsx('data/xls/processed/trove_main.xlsx')
+trove_m_arts <- readxl::read_xlsx('data/xls/processed/trove_m_arts.xlsx')
+
 arts_wsnt <- readRDS('data/rds/arts_wsnt.rds')
 art_sent <- readRDS('data/rds/art_sent.rds')
 
@@ -85,6 +87,7 @@ mprops <- sfn_level %>%
 model <- glm(ismon ~ decade, data = sfn_level, 
              family = binomial)
 summary(model)
+par(mfrow = c(2,2))
 plot(model)
 
 ggplot(mprops, aes(x = decade, y = prop_monster)) +

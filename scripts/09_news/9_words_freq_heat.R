@@ -1,11 +1,12 @@
 # Details ----
-#' 9_news_words_common.R
+#' 9_words_freq_heat.R
 #' Paper: [Est. extent of range contraction and extinction timeline]
 #' DOI: tbd
 #' Author: Nikki Biskis
 #' Date: 2025-12-1
 #' Content: timeline of common terms
-#' + Figure 11b
+#' + Figure 12
+#' *Final fig for thesis
 #' -----------
 
 source('helpers/help_news.R')
@@ -55,18 +56,6 @@ word_trends <- art_sent %>%
   mutate(pct = n / total_articles) %>%
   dplyr::select(-total_articles)
 
-# Plot word trends 
-# this doesn't quite work hey... not a meaningful axis
-p_neg <- word_trends %>% 
-  filter(sentiment == "negative") %>%
-  ggplot(aes(x = decade, y = n, fill = word)) +
-  geom_area(position = "fill") +  
-  labs(x = "Decade",
-       y = "Proportion of Events Using Word") +
-  scale_fill_met_d(name = 'Manet') +
-  pilot::theme_pilot(grid = "", axes = "b") +
-  theme(legend.position = "right")
-
 # final plot!----
 a <- ggplot(data = word_trends %>% 
          mutate(sentiment = str_to_title(sentiment))) +
@@ -81,9 +70,12 @@ a <- ggplot(data = word_trends %>%
      y = NULL,
      fill = "% of Articles") +
     pilot::theme_pilot(grid = "", facet_title_size = 14,
-                   axis_title_size = 12, legend_title_size = 12) +
+                   axis_title_size = 12, legend_title_size = 12,
+                   axis_title_family = "optima", legend_title_family = "optima",
+                   axis_text_family = "optima", legend_text_family = "optima") +
     theme(strip.text.y.left = element_text(angle = 90, 
-                                           margin = margin(l = 5, r = 6)),
+                                           margin = margin(l = 5, r = 6), 
+                                           family = "optima"),
       strip.placement = "outside",
       strip.background = element_rect(fill = NA, color = "black"),
       axis.text.y = element_text(margin = margin(l = 10)),
@@ -91,31 +83,70 @@ a <- ggplot(data = word_trends %>%
       legend.box.spacing = unit(1, "pt"),
       plot.margin = margin(5, 0, 0, 25))
 
-
 b <- ggplot(data = arts_sfn,
        aes(x = year)) +
   geom_density() + 
   labs(x = "Year", y = "Number of\nEvents Reported") +
   scale_x_continuous(limits = c(1880, 1960)) +
   pilot::theme_pilot(grid = "h", axes = "b", 
-                     axis_title_size = 12, legend_title_size = 12) +
+                     axis_title_size = 12, 
+                     axis_title_family = "optima", axis_text_family = "optima") +
   theme(axis.text.y = element_text(margin = margin(l = 10, r = 10)),
         plot.margin = margin(5, 0, 5, 20))
 
 plot_grid(a, 
           b, ncol = 1, align = "v", axis = "lr", 
           rel_heights = c(2.5, 1), labels = c('a)', 'b)'), label_fontface = "plain",
-          label_fontfamily = getOption("pilot.axis_text_family"))
+          label_fontfamily = "optima")
 
 
 ggsave(
-  "figs/fig12/f12_wordfreq_heat.tiff",
+  "f12_word_heat.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/fig12/",
   scale = 1,
   width = 7,
   height = 7,
+  units = c("in", "cm", "mm", "px"),
+  dpi = 300,
+  limitsize = TRUE,
+  bg = NULL,
+)
+
+## alt figure wordfreq----
+library(patchwork)
+
+p_neg <- ggplot(data = word_trends %>% 
+                  filter(sentiment == "negative"), 
+                aes(x = decade, y = n, fill = word)) +
+  geom_area(position = "fill") +  
+  labs(x = "Decade",
+       y = "Proportion of Events Using Word") +
+  scale_fill_met_d(name = 'Manet') +
+  pilot::theme_pilot(grid = "", axes = "b") +
+  theme(legend.position = "right")
+
+p_pos <- ggplot(data = word_trends %>% 
+                  filter(sentiment == "positive"), 
+                aes(x = decade, y = n, fill = word)) +
+  geom_area(position = "fill") +  
+  labs(x = "Decade",
+       y = "Proportion of Events Using Word") +
+  scale_fill_met_d(name = 'Redon') +
+  pilot::theme_pilot(grid = "", axes = "b") +
+  theme(legend.position = "right")
+
+p_neg + p_pos & theme(plot.margin = margin(5, 5, 5, 5))
+
+ggsave(
+  "wordfreq_stack.png",
+  plot = last_plot(),
+  device = NULL,
+  path = "figs/fig12/other_vs/",
+  scale = 1,
+  width = 9,
+  height = 5,
   units = c("in", "cm", "mm", "px"),
   dpi = 300,
   limitsize = TRUE,

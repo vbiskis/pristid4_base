@@ -1,5 +1,5 @@
 # Details ----
-#' 7_timeline_ext_results.R
+#' 9_news_stats.R
 #' Paper: [Est. extent of range contraction and extinction timeline]
 #' DOI: tbd
 #' Author: Nikki Biskis
@@ -10,6 +10,9 @@
 #' -----------
 
 source('helpers/help_stat.R')
+source('helpers/help_news.R')
+set_theme(mytheme)
+
 trove_all <- readxl::read_xlsx("data/xls/TroveDat_ALLArts.xlsx") 
 trove <- readxl::read_xlsx("data/xls/News_SU.xlsx") #news
 
@@ -146,13 +149,11 @@ summary(lm(NP_pg_cln ~ Size_cm, data = trove_tests))
 npglm <- glm(log(NP_pg_cln) ~ log(Size_cm) + NP_Rural*LocalR + Year_Art,
             data = trove_tests)
 
+par(mfrow = c(2,2))
 plot(npglm)
-summary(npglm)
-#but page number is more affected by region
+summary(npglm) #but page number is more affected by region
 
-#looking at words used based on these factors in next one
-
-#last thing - pic or not?
+## pic----
 
 sitsonly <- trove_tests %>% 
   filter(ArtType == "Sawfish capture/sighting") %>% 
@@ -167,16 +168,6 @@ sitsonly %>%
   ) #slightly yes
 
 t.test(Size_cm ~ Picture, data = sitsonly) #awesome
-
-library(DHARMa)
-library(performance)
-
-#to check a model if i build one... not nec i think
-model_performance(tlbias_nb)
-check_overdispersion(tlbias_nb)  # Should be much better now
-simulationOutput_nb <- simulateResiduals(tlbias_nb)
-plot(simulationOutput_nb) #oh hell ya!
-r2(tlbias_nb)
 
 ggplot(sitsonly) +
   geom_point(aes(x = Size_cm, y = NP_pg_cln,
@@ -193,17 +184,19 @@ ggplot(sitsonly) +
     x = "Total Length Reported (cm)",
     y = "Page in Newspaper"
   ) +
-  theme_bw() +
   theme(
+    strip.background.x = element_rect(color = "grey50", linewidth = 1),
+    strip.text.x = element_text(margin = margin(t = 5, b = 5)),
     strip.text.y = element_blank(),
-    legend.position = "bottom"
+    legend.position = "bottom",
+    plot.margin = margin(5,5,5,5)
   )
 
 ggsave(
-  "newspaperstats.tiff",
+  "fig11.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/fig11/",
   scale = 1,
   width = 6,
   height = 5,

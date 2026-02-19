@@ -12,6 +12,9 @@
 EC_Spec <- readxl::read_xlsx("data/xls/processed/EC_Spec.xlsx") 
 source('helpers/help_map.R')
 
+source('helpers/help_news.R')
+set_theme(mytheme)
+
 EC_Map <- EC_Spec %>% 
   filter(Rec_Acc > 0)
 
@@ -96,15 +99,15 @@ ggplot() +
                      )) + 
   scale_x_continuous(breaks = seq(142, 154, by = 5)) +
   scale_fill_manual(name = "Species", values = species_colors, guide = "none") +
-  theme_few() +
   theme(legend.position = "none",
-        strip.text = element_text(hjust = 0, size = 12))
+        strip.text = element_text(hjust = 0, size = 12, face = "plain"),
+        plot.margin = margin(5, 5, 5 ,5))
 
 ggsave(
-  "figs/fig6/fig6_spec_maps.png",
+  "fig6.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/fig6/",
   scale = 1,
   width = 10,
   height = 6,

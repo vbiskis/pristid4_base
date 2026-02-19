@@ -11,6 +11,8 @@
 #' -----------
 
 source('helpers/help_stat.R')
+# set_theme(mytheme) #not actually the best for this one!
+
 library(ggthemes)
 
 EC_Dens <- readxl::read_xlsx("data/xls/processed/EC_Dens.xlsx") 
@@ -129,6 +131,10 @@ ggplot(SizeTrendDat) +
   ) +
   theme_clean() +
   theme(
+    text = element_text(family = "optima"),
+    axis.title = element_text(size = 13),
+    strip.text = element_text(size = 12),
+    axis.text = element_text(size = 11),
     strip.background = element_blank(),
     legend.position = "bottom",
     legend.background = element_blank(),
@@ -138,14 +144,17 @@ ggplot(SizeTrendDat) +
   guides(
     color = "none",        
     fill = "none",
-    size = guide_legend(title = "Pupping Events")  # Keep size
+    size = guide_legend(title = "Pupping Events",
+                        theme = theme(legend.title = element_text(family = "optima",
+                                                                  size = 13))
+    )
   )
 
 ggsave(
-  "figs/fig8/fig8_absiz.tiff",
+  "fig8.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/fig8",
   scale = 1,
   width = 8,
   height = 5,

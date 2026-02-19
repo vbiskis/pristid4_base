@@ -9,7 +9,9 @@
 #' Not sure needed yet, but saving
 #' -----------
 
-art_sent <- readRDS('data/rds/art_sent.rds')
+source('helpers/help_news.R')
+art_sent <- readRDS('data/rds/art_sent.rds') # all sentiment words per article (massive, multiple rows)
+arts_wsnt <- readRDS('data/rds/arts_wsnt.rds') # articles just with all words in one col
 
 ## PCA----
 library(stats)
@@ -41,7 +43,10 @@ pca_scores <- as.data.frame(pca_data$x) %>%
               filter(Year_Art < 1965) %>%
               dplyr::select(TVN, SFN, Period, net_sent, 
                             Year_Art, NP_Name_Fin, NP_Region, TL_final), 
-            by = "TVN")
+            by = "TVN") %>% 
+  mutate(Period = factor(Period, levels = c("Pre-1900", "1901-1915",
+                                            "1916-1930", "1931-1945", 
+                                            "1946-1960")))
 
 # Step 4: Get top word loadings for arrows
 loadings <- as.data.frame(pca_data$rotation[, 1:2])
@@ -89,10 +94,10 @@ ggplot(pca_scores_plot, aes(x = PC1, y = PC2)) +
   scale_color_met_d(name = 'Isfahan1') 
 
 ggsave(
-  "figs/fig12/f12a_wordpca.tiff",
+  "wordpca.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/fig12/other_vs/",
   scale = 1,
   width = 7,
   height = 5,

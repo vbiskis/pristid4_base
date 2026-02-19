@@ -10,12 +10,10 @@
 #' Output: methods data figure (fig3.png/tiff)
 #' -----------
 
-library(pacman) #pman tab shortcut 
-pacman::p_load("ggplot2", 
-                 "dplyr",
-                 "readxl")
+source('helpers/help_news.R')
 
 EC_Date <- readxl::read_xlsx("data/xls/processed/EC_Date.xlsx") 
+set_theme(mytheme)
 
 #Fig 5.3 - Data Source Simple ----
 ##1 - Get Summary----
@@ -65,14 +63,14 @@ sourcecov <- ggplot(sourcetib) +
                "museums" = "Museum Archives", "cytags" = "Cytags (SARA)")
   ) +
   scale_x_continuous(expand = expansion(add = c(10, 20))) +
-  labs(title = "", x = "Year", y = "Data Source") +
-  theme_minimal()
+  labs(x = "Year", y = "Data Source") +
+  theme(plot.margin = margin(5, 5, 5, 5))
 
 ggsave(
-  "figs/fig3/Fig5.3.png",
+  "fig3.png",
   plot = sourcecov,
   device = NULL,
-  path = NULL,
+  path = "figs/fig3/",
   scale = 1,
   width = 6,
   height = 2,

@@ -1,5 +1,5 @@
 # Details ----
-#' 7_timeline_ext_results.R
+#' 9_supp_newspaper.R
 #' Paper: [Est. extent of range contraction and extinction timeline]
 #' DOI: tbd
 #' Author: Nikki Biskis
@@ -10,9 +10,8 @@
 
 #needs edits! for auto fxn
 #but works fine
-
-pacman::p_load('readxl', 'writexl', 
-               'tidyverse', 'dplyr', 'tidyr')
+source('helpers/help_news.R')
+library(MetBrewer)
 
 allhist <- readxl::read_xlsx("data/xls/processed/allhist.xlsx") 
 EC_Spec <- readxl::read_xlsx("data/xls/processed/EC_Spec.xlsx") 
@@ -93,13 +92,17 @@ ggplot(np_qld, aes(y = y_pos)) +
   geom_point(aes(x = last_record, color = NP_Basin, shape = NP_Rural), size = 2) +
   facet_grid(NP_Region ~ ., scales = "free_y", space = "free_y") +
   scale_y_continuous(expand = expansion(add = c(0.75, 0.75))) +
-  labs(x = "Year", y = "Publications (S → N)", 
+  scale_color_manual(values = met.brewer('Redon', 18)) +
+  labs(x = "Year", y = expression("Publications (S " * symbol("\256") * " N)"), 
        title = "",
        color = "Basin") +
-  theme_bw() +
+  theme_few() +
   theme(
-    strip.text.y = element_text(angle = 0, hjust = , face = "bold"),  
-    axis.text.y = element_blank(),
+    strip.text.y = element_text(angle = 0, 
+                                face = "bold", family = "optima"),  
+    strip.background = element_rect(fill = "grey95", color = "grey90"),
+    axis.text.y = element_blank(), axis.text.x = element_text(family = "optima"),
+    axis.title = element_text(family = "optima"),
     axis.ticks.y = element_blank(),
     panel.grid.major.y = element_blank(),
     panel.grid.minor.y = element_blank(),
@@ -107,10 +110,10 @@ ggplot(np_qld, aes(y = y_pos)) +
   )
 
 ggsave(
-  "figs/s10/qld_papers_supp.tiff",
+  "qld_papers.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/s10/",
   scale = 1,
   width = 6,
   height = 8,
@@ -173,13 +176,17 @@ ggplot(np_nsw, aes(y = y_pos)) +
   geom_point(aes(x = last_record, color = NP_Basin, shape = NP_Rural), size = 2) +
   facet_grid(NP_Region ~ ., scales = "free_y", space = "free_y") +
   scale_y_continuous(expand = expansion(add = c(1.25, 1.25))) +
-  labs(x = "Year", y = "Publications (S → N)", 
+  scale_color_manual(values = met.brewer('Navajo', 23)) +
+  labs(x = "Year", y = expression("Publications (S " * symbol("\256") * " N)"), 
        title = "",
        color = "Basin") +
-  theme_bw() +
+  theme_few() +
   theme(
-    strip.text.y = element_text(angle = 0, hjust = , face = "bold"),  
-    axis.text.y = element_blank(),
+    strip.text.y = element_text(angle = 0, 
+                                face = "bold", family = "optima"),  
+    strip.background = element_rect(fill = "grey95", color = "grey90"),
+    axis.text.y = element_blank(), axis.text.x = element_text(family = "optima"),
+    axis.title = element_text(family = "optima"),
     axis.ticks.y = element_blank(),
     panel.grid.major.y = element_blank(),
     panel.grid.minor.y = element_blank(),
@@ -187,10 +194,10 @@ ggplot(np_nsw, aes(y = y_pos)) +
   )
 
 ggsave(
-  "figs/s10/nsw_papers_supp.tiff",
+  "nsw_papers.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/s10/",
   scale = 1,
   width = 6,
   height = 8,

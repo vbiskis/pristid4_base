@@ -255,7 +255,6 @@ if(avg_pct_turnover > avg_pct_nestedness) {
   cat("\nConclusion: Species LOSS/GAIN (nestedness) is the dominant driver of compositional change.\n")
 }
 
-
 # 1. PERMANOVA stats
 permanova_result$R2[1]          # R² value
 permanova_result$`Pr(>F)`[1]    # p-value

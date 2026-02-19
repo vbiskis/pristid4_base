@@ -10,12 +10,16 @@
 #' -----------
 
 source('helpers/help_stat.R')
+source('helpers/help_map.R')
+set_theme(mytheme)
+
 library(purrr)
 library(broom)
+library(gtable)
+library(grid)
 
 EC_Dens <- readxl::read_xlsx("data/xls/processed/EC_Dens.xlsx") 
 
-# gams----
 #remove juveniles and outliers:
 EC_Ad <- EC_Dens %>% 
   filter(TL >= 200 & TL < 780 # or just log it?
@@ -96,15 +100,20 @@ anova(gam_TL1, gam_TLyear3)
 
 # check----
 performance(gam_TLyear3)
-gam.check(gam_TLyear3)
-appraise(gam_TLyear3) #winner!
+gam.check(gam_TLyear3) #winner
+
+appraise(gam_TLyear3) & theme(plot.title = element_text(size = 12, family = "Optima",
+                                                        margin = margin(t = 5, b = 10, unit = "pt")),
+                              plot.subtitle = element_text(margin = margin(b = 5, unit = "pt")),
+                              plot.margin = margin(l = 2, t = 0, b = 5, r = 10, unit = "pt"),
+                              axis.title.y = element_text(margin = margin(r = 5, unit = "pt")))
 
 ## plot----
 ggsave(
-  "figs/s8/s8b_res_plot.png",
+  "s8b_res_plot.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = 'figs/s8/',
   scale = 1,
   width = 6,
   height = 4,
@@ -116,15 +125,18 @@ ggsave(
 
 # plot main----
 p3 <- plot_predictions(gam_TLyear3, condition = c("Year", "Zone"), 
-                       vcov = FALSE,
+                       vcov = TRUE,
                        rug = TRUE) +
   labs(y = "Maximum Total Length (cm)") +
-  theme(legend.position = "bottom") #yiks! way outside bounds
+  facet_wrap(~ Zone) +
+  theme(legend.position = "bottom") #yuck! way outside bounds
 
 p4 <- plot_predictions(gam_TLyear3, condition = c("Spec_Known")) +
-  labs(y = "", x = "") + 
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, face = "italic"),)  
+  scale_x_discrete(labels = species_labels) +
+  theme(axis.text.x = element_text(angle = 40, hjust = 1, vjust = 1,
+                                   margin = margin(b = 5)),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank())  
 
 #fix p3----
 pred_data <- EC_Ad %>%
@@ -145,40 +157,39 @@ p3 <- ggplot(preds,
              aes(x = Year, 
                  y = estimate, 
                  color = Zone)) +
-  facet_wrap( ~ NS, nrow = 2) +
+  facet_wrap( ~ NS, nrow = 2, scales = "free_y") + #now we can see!
   geom_line(aes(y = estimate), linewidth = 1) +
   geom_line(aes(y = conf.low), linetype = "dotted") +  
   geom_line(aes(y = conf.high), linetype = "dotted") +
   geom_rug(data = EC_Ad, aes(x = Year), sides = "b", inherit.aes = FALSE) +
   labs(y = "Mean Total Length (cm)", x = "Year") +
-  theme_minimal() +
   scale_color_brewer(palette = "Paired") +
   theme(axis.title.x = element_text(margin = margin(t = 10, b = 0)),
-        legend.margin = margin(l = 20),
+        legend.margin = margin(l = 10),
+        legend.text = element_text(size = 10),
         strip.text = element_blank()) +
   guides(color = guide_legend(nrow = 3, byrow = TRUE))
 
-
-library(gtable)
-library(grid)
-
 gt <- ggplotGrob(p3)
 legend <- gtable_filter(gt, "guide-box")
-legend_row <- wrap_plots(legend, plot_spacer(), widths = c(3, 1))
+legend_row <- wrap_plots(legend, plot_spacer(), widths = c(3, 1)) 
 
 p3_nl <- p3 + theme(legend.position = "none")
 
-p3_nl + (p4 / legend_row + plot_layout(heights = c(8, 1))) + 
-  plot_layout(widths = c(1.25, 1)) +
-  plot_annotation(tag_levels = list(c('a)', 'b)'))) 
+p3_nl + (p4 / plot_spacer() / legend_row + plot_layout(heights = c(12, 0.5, 2))) + 
+  plot_layout(widths = c(1.2, 1)) +
+  plot_annotation(tag_levels = list(c('a)', 'b)'))) &
+  theme(plot.margin = margin(5, 5, 5, 0),
+        plot.tag = element_text(family = "optima", size = 13),
+        plot.tag.position = c(0.03, 1))
 
 ggsave(
-  "figs/s8/s8a_partialsize_plot.tiff",
+  "s8a_partialsize_plot.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/s8/",
   scale = 1,
-  width = 6,
+  width = 6.75,
   height = 4,
   units = c("in", "cm", "mm", "px"),
   dpi = 300,

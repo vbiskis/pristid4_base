@@ -10,6 +10,7 @@
 
 #timeline calcs
 source('helpers/help_stat.R')
+
 library(ggthemes)
 library(writexl)
 
@@ -17,7 +18,7 @@ source("scripts/07_timelines/7_timeline_ext_fxn.R")
 EC_Date <- readxl::read_xlsx("data/xls/processed/EC_Date.xlsx") # using unconfirmed for some methods
 EC_Dens <- readxl::read_xlsx("data/xls/processed/EC_Dens.xlsx") # only reliable
 
-#big question - is there a diff in record type?
+# Summary check----
 
 EC_Date %>% 
   group_by(Zone) %>% 
@@ -42,26 +43,9 @@ EC_Date %>%
     years = n_distinct(Year)
   )
 
-#all species gone from Brisbane S
-#PP/PC - basically all other than FNQ
+#PP/PC - ext everywhere other than FNQ
 #AC - known to at least Baffle, likely Mary; not ext
-#PZ - Shoalwater Bay
-
-# Calculations!! ----
-
-## By region----
-# FNQ obvs makes no sense - all species potentially possible, seen in last 20 years
-# w/ NQ: use as logic/qual check
-
-# CQ: large animals (filter TL or anoxy?)
-
-# SEQ: 
-# P. pristis
-# P. zijsron
-
-# NNSW: All species (pz)
-
-# MNSW: All species (pz)
+#PZ - to Shoalwater Bay
 
 # All----
 regions <- rev(c("Mid Coast NSW", "North Coast NSW", # everything
@@ -81,12 +65,12 @@ for(i in seq_along(regions)) {
 
 summary_table <- ext_stbl(results_list, regions)
 print(summary_table)
-write_xlsx(summary_table, "results/s8/extinction_analysis1990.xlsx")
-#for all regions: supp
 
-# Look at species----
-#get rid of the anoxy and freshies
-#have some species overlap tho
+## Supps: Ext Table----
+write_xlsx(summary_table, "results/s8/extinction_analysis1990.xlsx")
+
+# Species w/ data----
+## zijsron----
 PZ <- EC_Date %>% 
   filter((Spec_Known == "P. zijsron" | 
             (Spec_Known == "Pristidae" & (is.na(TL) | TL > 150))) # not anoxy (small TL)
@@ -98,44 +82,44 @@ PZ <- EC_Date %>%
     Region = fct_reorder(Region, mean_lat),
     )
 
-regionspx <- c("SHOALWATER BAY", "FITZROY", "BURNETT", "MARY", 
+regionszx <- c("SHOALWATER BAY", "FITZROY", "BURNETT", "MARY", 
                "BRISBANE", "GOLD COAST", "NORTHERN RIVERS", 
                "COFFS COAST", "HUNTER", "SYDNEY")
 
-basinspx <- PZ %>%
-  filter(Region %in% regionspx) %>%  # or whatever your region names are
+### basins----
+basinszx <- PZ %>% # try smaller regions?
+  filter(Region %in% regionszx) %>% 
   pull(Basin) %>%
   unique() %>%
   as.character()
 
-basinspx <- basinspx[!is.na(basinspx)]
+basinszx <- basinszx[!is.na(basinszx)]
 
-#basins
 results_list <- list()
 
-for(i in seq_along(basinspx)) {
-  results_list[[i]] <- get_ext_timelines(PZ, "Basin", basinspx[i],
+for(i in seq_along(basinszx)) {
+  results_list[[i]] <- get_ext_timelines(PZ, "Basin", basinszx[i],
                                          confidence_col = "Rec_Acc", timefrom = 1990)
 }
 
-ext_stbl(results_list, basinspx)
+ext_stbl(results_list, basinszx) # nah we'll try bigger
 
-#regions
+### regions----
 resultsz <- list()
 
-for(i in seq_along(regionspx)) {
-  resultsz[[i]] <- get_ext_timelines(PZ, "Region", regionspx[i],
+for(i in seq_along(regionszx)) {
+  resultsz[[i]] <- get_ext_timelines(PZ, "Region", regionszx[i],
                                          confidence_col = "Rec_Acc", timefrom = 1990)
 }
 
-ext_stbl(resultsz, regionspx)
-plot_timeline(resultsz, regionspx, title = "a)",
+ext_stbl(resultsz, regionszx)
+plot_timeline(resultsz, regionszx, title = "a)",
          current_year = 1990)
 
-summary_et_pz <- ext_stbl(resultsz, regionspx)
+summary_et_pz <- ext_stbl(resultsz, regionszx)
 write_xlsx(summary_et_pz, "figs/fig9/extinction_analysis_pz.xlsx")
 
-# pristis:----
+## pristis:----
 PP <- EC_Date %>% 
   filter(Spec_Known == "P. pristis" | Species == "P. clavata / P. pristis",
          Zone != "Cape York QLD") %>% 
@@ -161,40 +145,42 @@ plot_timeline(resultsp, pplist, title = "b)",
 summary_et_pp <- ext_stbl(resultsp, pplist)
 write_xlsx(summary_et_pp, "figs/fig9/extinction_analysis_pp.xlsx")
 
-#graph both:
+# Plot ----
 all_sig_levels <- c("p < 0.001", "p < 0.01", "p < 0.05", "p < 0.1", "p ≥ 0.1", 
                     "Bayesian")
 all_colors <- c("p < 0.001" = "darkgreen", "p < 0.01" = "#2ca02c", 
                 "p < 0.05" = "gold", "p < 0.1" = "#1f77b4",
                 "p ≥ 0.1" = "#7f7f7f", "Bayesian" = "#9467bd")
 
-pz_tl <- plot_timeline(resultsz, regionspx, title = "a)", current_year = 1990) + 
+pz_tl <- plot_timeline(resultsz, regionszx, title = "a)", current_year = 1990) + 
   scale_color_manual(values = all_colors, limits = all_sig_levels, drop = FALSE) +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom", 
+        text = element_text(family = "optima"))
 
 pp_tl <- plot_timeline(resultsp, pplist, title = "b)", current_year = 1990) + 
   scale_color_manual(values = all_colors, limits = all_sig_levels, drop = FALSE) +
-  theme(legend.position = "none")  # Remove legend from second plot
+  theme(legend.position = "none", # Remove legend from second plot
+        text = element_text(family = "optima"))  
 
 # Combine 
 p1 <- pz_tl + theme(legend.position = "none")
-p2 <- pp_tl + theme(legend.position = "none",
-                    axis.title.y = element_blank())
+p2 <- pp_tl + theme(axis.title.y = element_blank())
 
 library(cowplot)
+library(patchwork)
 # Get the legend from the first plot
 legend <- get_legend(pz_tl + theme(legend.position = "right",
                                    legend.box = "vertical"))
 
 # Combine
-p1 + (p2 / legend + plot_layout(heights = c(2, 1))) + plot_layout(widths = c(1.5, 1))
+p1 + (p2 / wrap_elements(legend) + plot_layout(heights = c(2, 1))) + plot_layout(widths = c(1.5, 1)) 
 
 #got em!
 ggsave(
-  "figs/fig9/fig9_ext_tl.tiff",
+  "fig9.png",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = "figs/fig9/",
   scale = 1,
   width = 9,
   height = 6,

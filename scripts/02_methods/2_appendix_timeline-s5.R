@@ -11,9 +11,8 @@
 #' + separate table of all data sources for appendix (incoming)
 #' -----------
 
-pacman::p_load("ggplot2", 
-               "dplyr",
-               "readxl")
+source('helpers/help_news.R')
+set_theme(mytheme)
 
 #want all dates for full visual
 EC_Spec <- readxl::read_xlsx("data/xls/processed/EC_Spec.xlsx") 
@@ -22,7 +21,7 @@ EC_Spec <- readxl::read_xlsx("data/xls/processed/EC_Spec.xlsx")
 # GoC is just a bunch of baby PPs
 # not a useful rep with the dist of newspapers
 
-#1 - Data Source Dist ----
+# Data Source Dist ----
 #make a diff cutoff from drainage (that's just state): extent
 ##for easy vis.----
 EC_TL <- EC_Spec %>% 
@@ -34,7 +33,7 @@ EC_TL <- EC_Spec %>%
          Region = fct_reorder(Region, mean_lat)) %>% 
   filter(!is.na(Basin))
 
-#As Timeline:----
+# For Supps: Timeline:----
 sourceplot <- ggplot(EC_TL, aes(x = Year, y = Basin)) +
   geom_errorbarh(aes(xmin = case_when(
     Date_Acc == 1 ~ Year,      # Exact day - no uncertainty
@@ -64,14 +63,17 @@ sourceplot <- ggplot(EC_TL, aes(x = Year, y = Basin)) +
   facet_wrap(~ CurrRange, 
              ncol = 2, scales = "free") +
   labs(
-    title = "",
     x = "Year",
     y = "Drainage Basin",
     shape = "Data Source"
   ) +
-  theme_minimal() +
   theme(axis.text.y = element_text(size = 10),
-        strip.text = element_blank())
+        strip.text = element_blank(),
+        plot.margin = margin(5, 5, 5, 5),
+        legend.box = "vertical",
+        legend.box.spacing = unit(5, "pt"), # get closer to axis
+        legend.spacing = unit(-5, "pt"), # and to each other
+        legend.position = "bottom") 
 
 #As Grid:----
 ##prep----
@@ -82,7 +84,7 @@ EC_TL <- EC_TL %>% #need decades here... too many years
          has_unID = any(Spec_Conf == 2)) %>% #add some fun things in!
   ungroup()
 
-##alt plot----
+##ALT: Grid Plot----
 sourceplot2 <- ggplot(EC_TL %>% 
          mutate(Dec_Print = case_when(Decade == 1800 ~ 1850,
                                       .default = Decade)), #just for this graph, don't need to have in the actual df
@@ -115,13 +117,14 @@ sourceplot2 <- ggplot(EC_TL %>%
   scale_x_continuous(
     breaks = c(1850, 1860, 1870, 1880, 1890, 1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020),
     labels = c("1800", "//", "1870", "1880", "1890", "1900", "1910", "1920", "1930", "1940", "1950", "1960", "1970", "1980", "1990", "2000", "2010", "2020")
-  ) 
+  ) #gross
+
 
 #k fig s1:----
-ggsave("figs/s4/app_s4.png",
+ggsave("app_s4.png",
   plot = sourceplot,
   device = NULL,
-  path = NULL,
+  path = "figs/s4/",
   scale = 1,
   width = 12,
   height = 12,

@@ -11,14 +11,14 @@
 #' + separate table of all data sources for appendix (incoming)
 #' -----------
 
-pacman::p_load('readxl', 'writexl', 
-               'tidyverse', 'dplyr', 'tidyr',
-               'sf')
+source('helpers/help_news.R') # theme + stats
+set_theme(mytheme)
 
 EC_Date <- readxl::read_xlsx("data/xls/processed/EC_Date.xlsx") 
 
 #Density----
 library(ggridges)
+library(sf)
 
 #check species counts
 EC_Dens <- EC_Date %>%
@@ -69,21 +69,22 @@ ggplot(EC_Dens, aes(x = Year, y = Region)) +
     option = "turbo",
     direction = 1 
   ) +
-  labs(title = "", x = "Year", y = "Drainage Basin") +
-  theme_minimal() +
-  theme(axis.text = element_text(size = 10),
-        axis.title = element_text(size = 12))
+  labs(x = "Year", y = "Drainage Basin") +
+  theme(axis.title.x = element_text(size = 13),
+        axis.title.y = element_text(margin = margin(r = -10),
+                                    size = 13),
+        plot.margin = margin(8, 8, 5, 5))
 
 ggsave(
-  "figs/fig7/Fig7.png",
+  "fig7.tiff",
   plot = last_plot(),
   device = NULL,
-  path = NULL,
+  path = 'figs/fig7/',
   scale = 1,
   width = 9,
   height = 5,
   units = c("in", "cm", "mm", "px"),
-  #dpi = 300,
+  dpi = 300,
   limitsize = TRUE,
   bg = NULL,
 )
